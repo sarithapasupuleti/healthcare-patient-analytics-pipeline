@@ -1,0 +1,78 @@
+-- ============================================================
+-- Healthcare Patient Analytics Pipeline — BRONZE LAYER
+-- Azure Databricks + Unity Catalog | Step 7
+-- Catalog   : databricks_healthcare_ws_7405614041790072
+-- Schema    : bronze
+-- Source    : Parquet files in ADLS Gen2 (parquetcontainer)
+-- Ext. Loc. : ext-loc-healthcare-parquet
+-- Storage Cr: cred-healthcare-adls
+-- ============================================================
+
+-- ----------------------------------------------------------
+-- 1. CREATE BRONZE SCHEMA
+-- ----------------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze
+COMMENT 'Bronze layer - raw ingested healthcare data from ADLS Gen2 Parquet files';
+
+-- ----------------------------------------------------------
+-- 2. CREATE EXTERNAL TABLES (Bronze) — one per source file
+-- ----------------------------------------------------------
+
+-- 2.1 Hospital Info
+CREATE TABLE IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze.hospital_info
+USING PARQUET
+LOCATION 'abfss://parquetcontainer@adlsgen2healthanalytics.dfs.core.windows.net/hospital_info.parquet'
+COMMENT 'Raw hospital info data ingested from ADF pipeline (Bronze)';
+
+-- 2.2 Lab Results
+CREATE TABLE IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze.lab_results
+USING PARQUET
+LOCATION 'abfss://parquetcontainer@adlsgen2healthanalytics.dfs.core.windows.net/lab_results.parquet'
+COMMENT 'Raw lab results data ingested from ADF pipeline (Bronze)';
+
+-- 2.3 Patient Demographics
+CREATE TABLE IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze.patient_demographics
+USING PARQUET
+LOCATION 'abfss://parquetcontainer@adlsgen2healthanalytics.dfs.core.windows.net/patient_demographics.parquet'
+COMMENT 'Raw patient demographics data ingested from ADF pipeline (Bronze)';
+
+-- 2.4 Patient Diagnosis
+CREATE TABLE IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze.patient_diagnosis
+USING PARQUET
+LOCATION 'abfss://parquetcontainer@adlsgen2healthanalytics.dfs.core.windows.net/patient_diagnosis.parquet'
+COMMENT 'Raw patient diagnosis data ingested from ADF pipeline (Bronze)';
+
+-- 2.5 Patient Vitals
+CREATE TABLE IF NOT EXISTS databricks_healthcare_ws_7405614041790072.bronze.patient_vitals
+USING PARQUET
+LOCATION 'abfss://parquetcontainer@adlsgen2healthanalytics.dfs.core.windows.net/patient_vitals.parquet'
+COMMENT 'Raw patient vitals data ingested from ADF pipeline (Bronze)';
+
+-- ----------------------------------------------------------
+-- 3. VERIFICATION QUERIES
+-- ----------------------------------------------------------
+SELECT 'hospital_info' AS table_name, COUNT(*) AS row_count
+FROM databricks_healthcare_ws_7405614041790072.bronze.hospital_info
+UNION ALL
+SELECT 'lab_results', COUNT(*)
+FROM databricks_healthcare_ws_7405614041790072.bronze.lab_results
+UNION ALL
+SELECT 'patient_demographics', COUNT(*)
+FROM databricks_healthcare_ws_7405614041790072.bronze.patient_demographics
+UNION ALL
+SELECT 'patient_diagnosis', COUNT(*)
+FROM databricks_healthcare_ws_7405614041790072.bronze.patient_diagnosis
+UNION ALL
+SELECT 'patient_vitals', COUNT(*)
+FROM databricks_healthcare_ws_7405614041790072.bronze.patient_vitals;
+
+-- Sample check on each table
+SELECT * FROM databricks_healthcare_ws_7405614041790072.bronze.hospital_info LIMIT 10;
+SELECT * FROM databricks_healthcare_ws_7405614041790072.bronze.lab_results LIMIT 10;
+SELECT * FROM databricks_healthcare_ws_7405614041790072.bronze.patient_demographics LIMIT 10;
+SELECT * FROM databricks_healthcare_ws_7405614041790072.bronze.patient_diagnosis LIMIT 10;
+SELECT * FROM databricks_healthcare_ws_7405614041790072.bronze.patient_vitals LIMIT 10;
+
+-- ============================================================
+-- END OF BRONZE LAYER SCRIPT
+-- ============================================================
